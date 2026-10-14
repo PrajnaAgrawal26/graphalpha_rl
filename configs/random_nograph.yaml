@@ -1,0 +1,5 @@
+# Baseline: uniformly random valid actions, no graph operators
+name: random_nograph
+agent: random
+graphs: []
+curriculum: []

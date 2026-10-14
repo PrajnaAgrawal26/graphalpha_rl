@@ -1,0 +1,4 @@
+# Policy ablation: flat-sequence LSTM instead of Tree-GAT
+name: all_lstm
+graphs: [sector, corr, lead]
+policy: lstm

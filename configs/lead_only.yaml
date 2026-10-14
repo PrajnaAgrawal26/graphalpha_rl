@@ -1,0 +1,4 @@
+# Dynamic lead-lag graph only
+name: lead_only
+graphs: [lead]
+policy: gat

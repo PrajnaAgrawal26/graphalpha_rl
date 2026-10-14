@@ -1,0 +1,4 @@
+# Dynamic rolling-correlation graph only
+name: corr_only
+graphs: [corr]
+policy: gat

@@ -1,0 +1,5 @@
+# Baseline: uniformly random valid actions, full vocabulary
+name: random_graph
+agent: random
+graphs: [sector, corr, lead]
+curriculum: []

@@ -1,0 +1,13 @@
+# Fast smoke test on a synthetic market (not a result)
+name: smoke
+data_path: data/synthetic.npz
+graphs: [sector, corr, lead]
+policy: gat
+total_timesteps: 4096
+n_steps: 512
+batch_size: 128
+pool_capacity: 5
+curriculum: [[0, 7, false], [150, 11, true], [400, 15, true]]
+train: ["2012-01-01", "2017-12-31"]
+valid: ["2018-01-01", "2019-12-31"]
+test: ["2020-01-01", "2021-12-31"]

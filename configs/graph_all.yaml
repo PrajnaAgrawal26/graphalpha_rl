@@ -1,0 +1,4 @@
+# Full model: graph operators (sector+corr+lead), Tree-GAT policy, curriculum, diversity reward
+name: graph_all
+graphs: [sector, corr, lead]
+policy: gat

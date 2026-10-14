@@ -1,0 +1,5 @@
+# Reward ablation: no novelty bonus
+name: all_nodiv
+graphs: [sector, corr, lead]
+policy: gat
+beta_div: 0.0

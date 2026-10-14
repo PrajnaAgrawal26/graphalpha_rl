@@ -1,0 +1,4 @@
+# Static sector graph only
+name: sector_only
+graphs: [sector]
+policy: gat

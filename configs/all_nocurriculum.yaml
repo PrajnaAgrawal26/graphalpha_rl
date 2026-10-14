@@ -1,0 +1,5 @@
+# Curriculum ablation
+name: all_nocurriculum
+graphs: [sector, corr, lead]
+policy: gat
+curriculum: []
