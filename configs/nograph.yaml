@@ -1,4 +1,4 @@
-# AlphaGen-style language (no graph operators), same policy/reward/curriculum
+# Standard time-series language (no graph operators), same policy/reward/curriculum
 name: nograph
 graphs: []
 policy: gat

@@ -42,6 +42,28 @@ class Node:
     def uses_graph(self) -> bool:
         return self.kind == "graph" or any(a.uses_graph() for a in self.args)
 
+    def canonical_str(self) -> str:
+        if self.kind == "feat":
+            return f"${self.name}"
+        if self.kind == "const":
+            return f"{self.value:g}"
+        if self.kind == "win":
+            return f"{int(self.value)}"
+        if self.kind == "graph":
+            return f"G_{self.name}"
+        args_strs = [a.canonical_str() for a in self.args]
+        if self.name in ("Add", "Mul", "Corr", "Cov") and len(args_strs) == 2:
+            args_strs.sort()
+        return f"{self.name}({', '.join(args_strs)})"
+
+    def features(self) -> set[str]:
+        if self.kind == "feat":
+            return {self.name}
+        feats: set[str] = set()
+        for a in self.args:
+            feats.update(a.features())
+        return feats
+
 
 def evaluate(node: Node, market, upto: int) -> Union[torch.Tensor, float]:
     """Evaluate ``node`` on days ``[0, upto)``; returns ``[upto, N]`` (or a float for constants)."""

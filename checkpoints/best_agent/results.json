@@ -1,0 +1,76 @@
+{
+  "name": "nse_v2_nse_advanced",
+  "seed": 1,
+  "pool_size": 10,
+  "train_obj": 0.0593317887788518,
+  "train_ic": 0.0668700635433197,
+  "train_rank_ic": 0.06018735468387604,
+  "train_icir": 0.48425232027224296,
+  "valid_ic": 0.04664912074804306,
+  "valid_rank_ic": 0.024027058854699135,
+  "valid_icir": 0.26803087256688507,
+  "test_ic": 0.03621116280555725,
+  "test_rank_ic": 0.0153584536164999,
+  "test_icir": 0.2539751916187528,
+  "bt_annual_return": 0.32407000674133135,
+  "bt_sharpe": 1.9443110826561092,
+  "bt_max_drawdown": -0.12425191269883262,
+  "bt_bench_annual_return": 0.3023009889087347,
+  "bt_bench_sharpe": 1.7878273329176906,
+  "bt_excess_annual_return": 0.02176901783259666,
+  "bt_avg_turnover": 0.6881720430107527,
+  "pool_mean_abs_corr": 0.08853741320716735,
+  "uses_graph": 2,
+  "formulas": [
+    {
+      "formula": "Delta(Ref(Mul(Mul($low, -1), 5), 20), 40)",
+      "weight": -0.00924440287053585,
+      "train_ic": -0.00924440287053585
+    },
+    {
+      "formula": "Log(Greater(-0.01, Abs(NbrRank(Delta($open, 40), G_corr))))",
+      "weight": 0.006609007716178894,
+      "train_ic": 0.006609007716178894
+    },
+    {
+      "formula": "Sub(-0.5, Min(Ref(Sub($volume, -5), 40), 10))",
+      "weight": 0.03006107360124588,
+      "train_ic": 0.03006107360124588
+    },
+    {
+      "formula": "Div(Mul(1, $close), Mul(EMA($vwap, 1), 5))",
+      "weight": -0.021783094853162766,
+      "train_ic": -0.021783094853162766
+    },
+    {
+      "formula": "Div(-0.5, Mul(Min($volume, 40), Add(0.01, $open)))",
+      "weight": -0.05555124953389168,
+      "train_ic": -0.05555124953389168
+    },
+    {
+      "formula": "Add(Delta(Add($open, 1), 10), Div($low, $volume))",
+      "weight": -0.004699499346315861,
+      "train_ic": -0.004699499346315861
+    },
+    {
+      "formula": "Greater(Sub(0.5, $low), Div(5, Sub($close, 5)))",
+      "weight": -0.009580867365002632,
+      "train_ic": -0.009580867365002632
+    },
+    {
+      "formula": "Less(Greater(Delta(Add($open, -0.01), 1), -0.01), 0.5)",
+      "weight": -0.011455352418124676,
+      "train_ic": -0.011455352418124676
+    },
+    {
+      "formula": "Mul(NbrRank($close, G_corr), Sub($volume, Add(-0.5, $volume)))",
+      "weight": -0.009962040930986404,
+      "train_ic": -0.009962040930986404
+    },
+    {
+      "formula": "Mul(-1, EMA(Min(Delta($open, 20), 5), 20))",
+      "weight": -0.004124562721699476,
+      "train_ic": -0.004124562721699476
+    }
+  ]
+}

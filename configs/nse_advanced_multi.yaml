@@ -1,0 +1,8 @@
+name: nse_advanced_multi
+graphs: [sector, corr]
+policy: gat
+dense_reward: true
+robust_folds: 3
+robust_lambda: 1.0
+obj_metric: rank_ic
+fast_ast_dedup: true

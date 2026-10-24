@@ -1,0 +1,5 @@
+# sector_only + dense reward (fixes zero reward once the pool is saturated)
+name: sector_dense
+graphs: [sector]
+policy: gat
+dense_reward: true

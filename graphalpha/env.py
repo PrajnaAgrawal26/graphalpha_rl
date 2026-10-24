@@ -18,7 +18,7 @@ from .grammar import TOP_K, FormulaBuilder
 from .pool import AlphaPool
 from .vocab import Vocab
 
-CTX_DIM = 4
+CTX_DIM = 8
 
 
 class AlphaEnv(gym.Env):
@@ -58,11 +58,16 @@ class AlphaEnv(gym.Env):
         tokens = np.zeros(self.L, dtype=np.float32)
         tokens[: len(b.tokens)] = np.asarray(b.tokens, dtype=np.float32) + 1.0
         top = np.asarray(b.top_positions(), dtype=np.float32)
+        prop_price, prop_vol, prop_graph, mean_corr = self.pool.pool_composition_stats()
         ctx = np.array([
             (self._stage_len - len(b.tokens)) / self.L,
             1.0 if self._stage_graph else 0.0,
             self.pool.size / max(self.pool.capacity, 1),
             float(np.clip(self.pool.obj * 10.0, -10.0, 10.0)),
+            prop_price,
+            prop_vol,
+            prop_graph,
+            mean_corr,
         ], dtype=np.float32)
         return {"tokens": tokens, "adj": b.adj.copy(), "top": top, "ctx": ctx}
 

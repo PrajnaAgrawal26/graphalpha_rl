@@ -1,0 +1,8 @@
+# Flat LSTM baseline + dense reward
+name: lstm_dense
+graphs: []
+policy: lstm
+beta_div: 0.0
+gamma_len: 0.0
+curriculum: [[0, 15, true]]
+dense_reward: true

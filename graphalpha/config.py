@@ -33,7 +33,7 @@ class Config:
     # ---- formula language / environment ------------------------------
     max_len: int = 15
     curriculum: List[List[Any]] = field(
-        default_factory=lambda: [[0, 7, False], [4000, 11, True], [10000, 15, True]]
+        default_factory=lambda: [[0, 9, True], [2000, 12, True], [6000, 15, True]]
     )  # rows: [episode_threshold, max_len, graph_ops_allowed]
 
     # ---- alpha pool / reward -----------------------------------------
@@ -45,6 +45,11 @@ class Config:
     gamma_len: float = 0.05             # complexity penalty weight
     invalid_penalty: float = 0.5
     dup_penalty: float = 0.2
+    dense_reward: bool = False          # rejected candidates still get graded reward (fixes frozen-pool zero signal)
+    robust_folds: int = 0               # >=2: reward uses mean(fold IC) - lambda*std(fold IC) over train folds
+    robust_lambda: float = 1.0          # penalty on IC instability across train sub-periods
+    obj_metric: str = "ic"              # "ic" (Pearson) | "rank_ic" (Spearman Rank IC)
+    fast_ast_dedup: bool = True         # O(1) canonical AST hash deduplication before GPU eval
 
     # ---- policy / PPO ------------------------------------------------
     policy: str = "gat"                 # "gat" | "lstm"

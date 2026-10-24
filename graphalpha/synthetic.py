@@ -4,6 +4,13 @@ Planted structure so that graph operators *can* matter:
   * sector factors      -> stocks in a sector co-move
   * leader -> follower  -> a follower's return today loads on its leader's idiosyncratic return yesterday
   * sector mean reversion -> a stock that outran its sector over 5 days drifts back
+
+Regimes (parameter presets, see ``REGIMES``):
+  * ``mixed``      -> original market; a plain 5-day reversal already carries most of the signal
+  * ``relational`` -> large sector factor + weak idiosyncratic noise + strong leader/follower and
+                      sector-relative reversal, so own-history formulas are weak and the
+                      cross-stock (graph) formulas carry the signal. This is a *controlled
+                      experiment* and must be reported as designed data, not as a real market.
 """
 from __future__ import annotations
 
@@ -13,6 +20,11 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
+REGIMES = {
+    "mixed":      dict(sec_vol=0.006, idio_vol=0.012, lead_coef=0.30, rev_coef=0.04),
+    "relational": dict(sec_vol=0.030, idio_vol=0.010, lead_coef=0.50, rev_coef=0.15),
+}
+
 
 def make_synthetic(
     path: Optional[str] = None,
@@ -21,7 +33,11 @@ def make_synthetic(
     end: str = "2024-12-31",
     n_sectors: int = 10,
     seed: int = 0,
+    regime: str = "mixed",
 ) -> dict:
+    if regime not in REGIMES:
+        raise ValueError(f"unknown regime '{regime}', choose from {sorted(REGIMES)}")
+    p = REGIMES[regime]
     rng = np.random.default_rng(seed)
     dates = pd.bdate_range(start, end)
     T, N = len(dates), n_stocks
@@ -34,17 +50,17 @@ def make_synthetic(
     is_follower = ~np.isin(np.arange(N), leaders)
 
     mkt = rng.normal(0.0003, 0.008, T)
-    sec = rng.normal(0.0, 0.006, (T, n_sectors))
-    idio = rng.normal(0.0, 0.012, (T, N))
+    sec = rng.normal(0.0, p["sec_vol"], (T, n_sectors))
+    idio = rng.normal(0.0, p["idio_vol"], (T, N))
     ret = np.zeros((T, N))
     rel = np.zeros((T, N))                              # return relative to sector mean
     for t in range(T):
         base = beta * mkt[t] + sec[t, sector] + idio[t]
         if t >= 1:
-            base = base + np.where(is_follower, 0.30 * idio[t - 1, leader_of], 0.0)
+            base = base + np.where(is_follower, p["lead_coef"] * idio[t - 1, leader_of], 0.0)
         if t >= 6:
             drift = rel[t - 5:t].sum(axis=0)
-            base = base - 0.04 * drift
+            base = base - p["rev_coef"] * drift
         ret[t] = base
         sec_mean = np.array([ret[t, sector == s].mean() if (sector == s).any() else 0.0 for s in range(n_sectors)])
         rel[t] = ret[t] - sec_mean[sector]

@@ -6,7 +6,7 @@ masked multi-head attention restricted to those edges (graph attention) let info
 between operators and operands; the readout combines a mean over nodes with the embeddings of the
 current top-of-stack subtrees, which is exactly what the next-token decision depends on.
 
-``LSTMExtractor`` reads the flat token sequence (the AlphaGen-style baseline).
+``LSTMExtractor`` reads the flat token sequence (the flat sequential baseline).
 """
 from __future__ import annotations
 

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -24,6 +24,7 @@ import torch
 from .expr import Node, evaluate
 from .grammar import build_from_keys
 from .metrics import daily_ic, daily_rank_ic, nanmean, summarize, zscore_rows
+from .ops import rank_rows
 from .vocab import Vocab
 
 
@@ -53,9 +54,11 @@ class AlphaPool:
         self.capacity = cfg.pool_capacity
         self.lo, self.hi = market.ic_slice("train")
         self.y = market.target[self.lo:self.hi]
+        self.y_rank = rank_rows(self.y)
         self.members: List[Member] = []
         self.obj = 0.0                   # ensemble IC on train slice
         self.eval_count = 0
+        self.visited_sigs: set[str] = set()
 
     # ------------------------------------------------------------------
     @property
@@ -72,7 +75,19 @@ class AlphaPool:
         return self._weights([m.ic for m in self.members]).cpu().numpy()
 
     def _objective(self, ensemble: torch.Tensor) -> float:
-        v = nanmean(daily_ic(ensemble, self.y))
+        if getattr(self.cfg, "obj_metric", "ic") == "rank_ic":
+            ic = daily_ic(rank_rows(ensemble), self.y_rank)
+        else:
+            ic = daily_ic(ensemble, self.y)
+        k = self.cfg.robust_folds
+        if k >= 2:
+            # stability-aware objective: mean - lambda * std of the IC over contiguous train folds
+            folds = [nanmean(c) for c in torch.tensor_split(ic, k)]
+            folds = [f for f in folds if f == f]
+            if len(folds) >= 2:
+                f = np.asarray(folds)
+                return float(f.mean() - self.cfg.robust_lambda * f.std())
+        v = nanmean(ic)
         return 0.0 if v != v else v
 
     # ------------------------------------------------------------------
@@ -94,6 +109,12 @@ class AlphaPool:
     def try_add(self, node: Node, n_tokens: int, budget: int) -> AddResult:
         cfg = self.cfg
         self.eval_count += 1
+        if getattr(cfg, "fast_ast_dedup", True):
+            sig = node.canonical_str()
+            if sig in self.visited_sigs:
+                return AddResult(-cfg.dup_penalty, "duplicate")
+            self.visited_sigs.add(sig)
+
         cand = self._candidate(node)
         if cand is None:
             return AddResult(-cfg.invalid_penalty, "invalid")
@@ -127,21 +148,55 @@ class AlphaPool:
                 obj_new, retained, drop = best_obj, True, best_j
 
         delta = obj_new - self.obj
-        novelty = cfg.beta_div * (1.0 - max_mut) * abs(ic) if retained else 0.0
+        r_delta = delta
+        if cfg.dense_reward and not retained:
+            # saturated pool: still tell the agent how much the rejected candidate would have changed the
+            # ensemble (<= 0, graded) instead of a flat zero
+            r_delta = self._objective(ens) - self.obj
+        novelty = cfg.beta_div * (1.0 - max_mut) * abs(ic) if (retained or cfg.dense_reward) else 0.0
         length_pen = cfg.gamma_len * n_tokens / max(budget, 1)
-        reward = cfg.reward_scale * (delta + novelty) - length_pen
+        reward = cfg.reward_scale * (r_delta + novelty) - length_pen
 
         if retained:
             if drop is not None:
                 del self.members[drop]
             self.members.append(Member(node, [], ic, zf))   # keys filled by caller
             self.obj = obj_new
-        parts = {"delta": cfg.reward_scale * delta, "novelty": cfg.reward_scale * novelty, "length": -length_pen}
+            self._update_stats()
+        parts = {"delta": cfg.reward_scale * r_delta, "novelty": cfg.reward_scale * novelty, "length": -length_pen}
         return AddResult(reward, "accepted" if retained else "rejected", ic, max_mut, delta, parts)
 
     def set_last_keys(self, keys: List[str]) -> None:
         if self.members:
             self.members[-1].keys = list(keys)
+
+    def _update_stats(self) -> None:
+        if not self.members:
+            self._stats = (0.0, 0.0, 0.0, 0.0)
+            return
+        n = len(self.members)
+        price_feats = {"open", "high", "low", "close"}
+        vol_feats = {"volume", "vwap"}
+        n_price = sum(bool(m.node.features() & price_feats) for m in self.members)
+        n_vol = sum(bool(m.node.features() & vol_feats) for m in self.members)
+        n_graph = sum(m.node.uses_graph() for m in self.members)
+        if n >= 2:
+            corrs = []
+            for i in range(n):
+                for j in range(i + 1, n):
+                    c = abs(nanmean(daily_ic(self.members[i].z, self.members[j].z)))
+                    if c == c:
+                        corrs.append(c)
+            mean_corr = float(np.mean(corrs)) if corrs else 0.0
+        else:
+            mean_corr = 0.0
+        self._stats = (n_price / n, n_vol / n, n_graph / n, mean_corr)
+
+    def pool_composition_stats(self) -> Tuple[float, float, float, float]:
+        """O(1) cached lookup of (prop_price, prop_vol, prop_graph, mean_corr)."""
+        if not hasattr(self, "_stats"):
+            self._update_stats()
+        return self._stats
 
     # ------------------------------------------------------------------
     # evaluation on any split (weights stay frozen at their training values)

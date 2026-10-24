@@ -1,0 +1,167 @@
+{
+  "objective_train": 0.0593317887788518,
+  "capacity": 10,
+  "weighting": "ic",
+  "members": [
+    {
+      "formula": "Delta(Ref(Mul(Mul($low, -1), 5), 20), 40)",
+      "keys": [
+        "feat:low",
+        "const:-1",
+        "Mul",
+        "const:5",
+        "Mul",
+        "win:20",
+        "Ref",
+        "win:40",
+        "Delta"
+      ],
+      "train_ic": -0.00924440287053585,
+      "weight": -0.00924440287053585
+    },
+    {
+      "formula": "Log(Greater(-0.01, Abs(NbrRank(Delta($open, 40), G_corr))))",
+      "keys": [
+        "const:-0.01",
+        "feat:open",
+        "win:40",
+        "Delta",
+        "graph:corr",
+        "NbrRank",
+        "Abs",
+        "Greater",
+        "Log"
+      ],
+      "train_ic": 0.006609007716178894,
+      "weight": 0.006609007716178894
+    },
+    {
+      "formula": "Sub(-0.5, Min(Ref(Sub($volume, -5), 40), 10))",
+      "keys": [
+        "const:-0.5",
+        "feat:volume",
+        "const:-5",
+        "Sub",
+        "win:40",
+        "Ref",
+        "win:10",
+        "Min",
+        "Sub"
+      ],
+      "train_ic": 0.03006107360124588,
+      "weight": 0.03006107360124588
+    },
+    {
+      "formula": "Div(Mul(1, $close), Mul(EMA($vwap, 1), 5))",
+      "keys": [
+        "const:1",
+        "feat:close",
+        "Mul",
+        "feat:vwap",
+        "win:1",
+        "EMA",
+        "const:5",
+        "Mul",
+        "Div"
+      ],
+      "train_ic": -0.021783094853162766,
+      "weight": -0.021783094853162766
+    },
+    {
+      "formula": "Div(-0.5, Mul(Min($volume, 40), Add(0.01, $open)))",
+      "keys": [
+        "const:-0.5",
+        "feat:volume",
+        "win:40",
+        "Min",
+        "const:0.01",
+        "feat:open",
+        "Add",
+        "Mul",
+        "Div"
+      ],
+      "train_ic": -0.05555124953389168,
+      "weight": -0.05555124953389168
+    },
+    {
+      "formula": "Add(Delta(Add($open, 1), 10), Div($low, $volume))",
+      "keys": [
+        "feat:open",
+        "const:1",
+        "Add",
+        "win:10",
+        "Delta",
+        "feat:low",
+        "feat:volume",
+        "Div",
+        "Add"
+      ],
+      "train_ic": -0.004699499346315861,
+      "weight": -0.004699499346315861
+    },
+    {
+      "formula": "Greater(Sub(0.5, $low), Div(5, Sub($close, 5)))",
+      "keys": [
+        "const:0.5",
+        "feat:low",
+        "Sub",
+        "const:5",
+        "feat:close",
+        "const:5",
+        "Sub",
+        "Div",
+        "Greater"
+      ],
+      "train_ic": -0.009580867365002632,
+      "weight": -0.009580867365002632
+    },
+    {
+      "formula": "Less(Greater(Delta(Add($open, -0.01), 1), -0.01), 0.5)",
+      "keys": [
+        "feat:open",
+        "const:-0.01",
+        "Add",
+        "win:1",
+        "Delta",
+        "const:-0.01",
+        "Greater",
+        "const:0.5",
+        "Less"
+      ],
+      "train_ic": -0.011455352418124676,
+      "weight": -0.011455352418124676
+    },
+    {
+      "formula": "Mul(NbrRank($close, G_corr), Sub($volume, Add(-0.5, $volume)))",
+      "keys": [
+        "feat:close",
+        "graph:corr",
+        "NbrRank",
+        "feat:volume",
+        "const:-0.5",
+        "feat:volume",
+        "Add",
+        "Sub",
+        "Mul"
+      ],
+      "train_ic": -0.009962040930986404,
+      "weight": -0.009962040930986404
+    },
+    {
+      "formula": "Mul(-1, EMA(Min(Delta($open, 20), 5), 20))",
+      "keys": [
+        "const:-1",
+        "feat:open",
+        "win:20",
+        "Delta",
+        "win:5",
+        "Min",
+        "win:20",
+        "EMA",
+        "Mul"
+      ],
+      "train_ic": -0.004124562721699476,
+      "weight": -0.004124562721699476
+    }
+  ]
+}

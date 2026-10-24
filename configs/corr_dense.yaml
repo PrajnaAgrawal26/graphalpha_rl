@@ -1,0 +1,4 @@
+name: corr_dense
+graphs: [corr]
+policy: gat
+dense_reward: true

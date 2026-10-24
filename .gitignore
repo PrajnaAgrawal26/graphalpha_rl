@@ -1,5 +1,5 @@
-data/*.npz
-data/cache/
+data/
+logs/
 runs/
 reports/figures/*.png
 __pycache__/
@@ -7,3 +7,8 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .ipynb_checkpoints/
+report.tex
+summarize.py
+reports/
+graphalpha/universe.py
+

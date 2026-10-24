@@ -1,0 +1,15 @@
+# Next-generation GraphAlpha configuration:
+# 1. Dynamic Rolling Correlation graph [corr]
+# 2. Context-Aware Tree-GAT policy (CTX_DIM=8 with pool feature breakdown)
+# 3. Dense reward signal
+# 4. 3-fold cross-regime robustness penalty
+# 5. Direct Rank-IC objective (Spearman rank correlation matching backtest)
+# 6. Fast canonical AST deduplication
+name: nse_advanced
+graphs: [corr]
+policy: gat
+dense_reward: true
+robust_folds: 3
+robust_lambda: 1.0
+obj_metric: rank_ic
+fast_ast_dedup: true

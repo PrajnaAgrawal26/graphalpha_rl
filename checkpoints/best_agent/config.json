@@ -1,0 +1,72 @@
+{
+  "name": "nse_v2_nse_advanced",
+  "seed": 1,
+  "out_dir": "runs",
+  "agent": "ppo",
+  "data_path": "data/nse100.npz",
+  "horizon": 20,
+  "train": [
+    "2012-01-01",
+    "2019-12-31"
+  ],
+  "valid": [
+    "2020-01-01",
+    "2021-12-31"
+  ],
+  "test": [
+    "2022-01-01",
+    "2024-06-30"
+  ],
+  "graphs": [
+    "corr"
+  ],
+  "graph_k": 8,
+  "graph_window": 60,
+  "graph_step": 5,
+  "max_len": 15,
+  "curriculum": [
+    [
+      0,
+      9,
+      true
+    ],
+    [
+      2000,
+      12,
+      true
+    ],
+    [
+      6000,
+      15,
+      true
+    ]
+  ],
+  "pool_capacity": 10,
+  "weighting": "ic",
+  "dup_threshold": 0.99,
+  "reward_scale": 10.0,
+  "beta_div": 0.3,
+  "gamma_len": 0.05,
+  "invalid_penalty": 0.5,
+  "dup_penalty": 0.2,
+  "dense_reward": true,
+  "robust_folds": 3,
+  "robust_lambda": 1.0,
+  "obj_metric": "rank_ic",
+  "fast_ast_dedup": true,
+  "policy": "gat",
+  "d_model": 64,
+  "n_layers": 3,
+  "n_heads": 4,
+  "total_timesteps": 40000,
+  "learning_rate": 0.0003,
+  "n_steps": 1024,
+  "batch_size": 128,
+  "n_epochs": 4,
+  "gamma": 1.0,
+  "gae_lambda": 0.95,
+  "ent_coef": 0.02,
+  "clip_range": 0.2,
+  "compute_device": "auto",
+  "policy_device": "cpu"
+}

@@ -97,3 +97,30 @@ def test_duplicate_is_penalised(small_market, small_cfg):
     again = pool.try_add(node, 3, 15)
     assert first.status == "accepted" and again.status == "duplicate"
     assert again.reward < 0
+
+
+def test_canonical_ast_dedup(small_market, small_cfg):
+    from graphalpha.grammar import build_from_keys
+    vocab = Vocab(small_cfg.graphs)
+    pool = AlphaPool(small_market, small_cfg, vocab)
+    node1 = build_from_keys(vocab, ["feat:close", "feat:open", "Add"])
+    node2 = build_from_keys(vocab, ["feat:open", "feat:close", "Add"])
+    assert node1.canonical_str() == node2.canonical_str()
+    res1 = pool.try_add(node1, 3, 15)
+    res2 = pool.try_add(node2, 3, 15)
+    assert res1.status == "accepted"
+    assert res2.status == "duplicate"
+
+
+def test_rank_ic_objective(small_market, small_cfg):
+    from graphalpha.grammar import build_from_keys
+    small_cfg.obj_metric = "rank_ic"
+    vocab = Vocab(small_cfg.graphs)
+    pool = AlphaPool(small_market, small_cfg, vocab)
+    node = build_from_keys(vocab, ["feat:close", "win:5", "Delta"])
+    res = pool.try_add(node, 3, 15)
+    assert res.status == "accepted"
+    assert pool.obj != 0.0
+    stats = pool.pool_composition_stats()
+    assert len(stats) == 4
+    assert stats[0] > 0.0  # uses close (price)

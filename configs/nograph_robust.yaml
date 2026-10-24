@@ -1,0 +1,6 @@
+# Standard time-series language (no graph ops) + stability-aware reward (4 train folds, lambda=1)
+name: nograph_robust
+graphs: []
+policy: gat
+robust_folds: 4
+robust_lambda: 1.0

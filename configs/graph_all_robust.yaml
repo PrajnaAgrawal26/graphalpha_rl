@@ -1,0 +1,6 @@
+# graph_all + stability-aware reward (4 train folds, lambda=1)
+name: graph_all_robust
+graphs: [sector, corr, lead]
+policy: gat
+robust_folds: 4
+robust_lambda: 1.0
